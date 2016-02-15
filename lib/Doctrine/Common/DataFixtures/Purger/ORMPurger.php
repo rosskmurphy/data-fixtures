@@ -134,12 +134,14 @@ class ORMPurger implements PurgerInterface
 
         $connection = $this->em->getConnection();
         foreach($orderedTables as $tbl) {
+            $this->em->getConnection()->executeUpdate("SET foreign_key_checks = 0;");
             if ($this->purgeMode === self::PURGE_MODE_DELETE) {
                 $tbl = $connection->quoteIdentifier($tbl);
                 $connection->executeUpdate('DELETE FROM ' . $tbl );
             } else {
                 $connection->executeUpdate($platform->getTruncateTableSQL($tbl, true));
             }
+            $this->em->getConnection()->executeUpdate("SET foreign_key_checks = 1;");
         }
     }
 
